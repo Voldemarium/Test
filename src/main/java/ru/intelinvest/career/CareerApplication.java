@@ -19,19 +19,14 @@ package ru.intelinvest.career;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ConfigurableApplicationContext;
-import ru.intelinvest.career.models.Stock;
-import ru.intelinvest.career.service.MoexService;
-
-import java.util.List;
+import org.springframework.cache.annotation.EnableCaching;
 
 @EnableConfigurationProperties
 @SpringBootApplication
+@EnableCaching
 public class CareerApplication {
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext context = SpringApplication.run(CareerApplication.class, args);
-
+	SpringApplication.run(CareerApplication.class, args);
 	}
-
 }

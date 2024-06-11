@@ -14,24 +14,25 @@
  * (c) ООО "Интеллектуальные инвестиции", 2019
  */
 
-package ru.intelinvest.career;
+package ru.intelinvest.career.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
-import ru.intelinvest.career.service.MoexService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.intelinvest.career.service.EthereumService;
 
-@Component
-@Slf4j
+@RestController
 @RequiredArgsConstructor
-public class StartupApplicationListener implements ApplicationListener<ApplicationReadyEvent> {
+@RequestMapping("/ethereum")
+@Slf4j
+public class EthereumEndpoint {
+    private final EthereumService ethereumService;
 
-    private final MoexService moexService;
-
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        log.debug("Загружено акций с Московской биржи: {}", moexService.getStocks());
+    @GetMapping("/balance")
+    public Double getBalance() {
+        return ethereumService.getBalance();
     }
+
 }

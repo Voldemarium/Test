@@ -2,20 +2,28 @@ package ru.intelinvest.career.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.intelinvest.career.models.BalanceOfTokens;
+
 import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EthereumService {
     private final RestTemplate restTemplate;
+    @Value("${ethereum.apikey}")
+    String apikey;
+    @Value("${ethereum.address}")
+    String address;
 
-    public BigDecimal getBalance() {
+    public Double getBalance() {
         return getBalanceOfTokens().getBalance();
     }
 
@@ -25,10 +33,10 @@ public class EthereumService {
                         "https://api.etherscan.io/api?" +
                                 "module=account" +
                                 "&action=tokenbalance" +
-                                "&contractaddress=0x77DDc987516abd90803b7e2A18F0F53a98438362" +
-                                "&address=0x77DDc987516abd90803b7e2A18F0F53a98438362" +
+                                "&contractaddress=" + address +
+                                "&address=" + address +
                                 "&tag=latest" +
-                                "&apikey=R7F8F1YQXEENJE8WZM6HH3AT24UIK35VCM",
+                                "&apikey=" + apikey,
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<>() {

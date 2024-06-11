@@ -26,88 +26,53 @@ import ru.intelinvest.career.models.PageOfStocks;
 import ru.intelinvest.career.models.Stock;
 import ru.intelinvest.career.service.MoexService;
 
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/moex")
 @Slf4j
 public class MoexEndpoint {
-
     private final MoexService moexService;
 
-    @PostMapping("stocks")
-    public ResponseEntity<List<Stock>> processIntegration() {
-        var stocks = moexService.getStocks();
-        // todo реализация задания № 2 и 3 здесь
-
-        return ResponseEntity.ok(stocks);
-    }
-
     @GetMapping("/stocks")
-    public ResponseEntity<List<Object>> getFilteredStocks(@RequestParam(required = false) Integer lotSize,
-                                                          @RequestParam(required = false) List<Integer> listLevel,
-                                                          @RequestParam(required = false) List<String> secId,
-                                                          @RequestParam(required = false, defaultValue = "1") Integer pageNumber,
-                                                          @RequestParam(required = false, defaultValue = "3") Integer limit
+    public ResponseEntity<List<Object>> getFilteredStocks(
+            @RequestParam(required = false) Integer lotSize,
+            @RequestParam(required = false) List<Integer> listLevel,
+            @RequestParam(required = false) List<String> secId,
+            @RequestParam(required = false, defaultValue = "1") Integer pageNumber,
+            @RequestParam(required = false, defaultValue = "3") Integer limit
     ) {
         List<Stock> stocks = moexService.getStocks();
         // Фильтрация данных
-        if (lotSize != null) {
-            stocks = stocks.stream()
-                    .filter(stock -> stock.getLotsize().equals(lotSize))
-                    .toList();
-        }
-        if (listLevel != null) {
-            stocks = stocks.stream()
-                    .filter(stock -> {
-                        for (Integer level : listLevel) {
-                            if (stock.getListlevel().equals(level)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    })
-                    .toList();
-        }
-        if (secId != null) {
-            stocks = stocks.stream()
-                    .filter(stock -> {
-                        for (String id : secId) {
-                            if (Objects.equals(stock.getSecId(), id)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    })
-                    .toList();
-        }
-        if (stocks.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+        List<Stock> filteredStocks = stocks.stream()
+                .filter(stock -> lotSize == null || stock.getLotsize().equals(lotSize))
+                .filter(stock -> getFilterResult(listLevel, stock.getListlevel()))
+                .filter(stock -> getFilterResult(secId, stock.getSecId()))
+                .toList();
 
-        // Пагинация данных
-        if (pageNumber != null && limit != null) {
-            int countStocks = stocks.size();
-            if (limit < countStocks) {
-                List<List<Stock>> pagesOfStocks = Lists.partition(stocks, limit);
-                int countPages = pagesOfStocks.size();
-                log.info("pageNumber: {}", pageNumber);
-                log.info("count pages: {}", countPages);
-                log.info("countStocks): {}", countStocks);
-                if (pageNumber < 1 || pageNumber > countPages) {
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                } else {
-                    PageOfStocks page = new PageOfStocks(pagesOfStocks.get(pageNumber - 1), pageNumber, limit,
-                            countPages, countStocks);
-                    return ResponseEntity.ok(Collections.singletonList(page));
-                }
+        // Ответ с пагинацией данных
+        return getResponseEntityOfPage(pageNumber, limit, filteredStocks);
+    }
+
+    // Метод фильтрации для параметров с множественным выбором,
+    private boolean getFilterResult(List<?> params, Object field) {
+        return params == null || params.stream().anyMatch(p -> p.equals(field));
+    }
+
+    // Пагинация данных
+    private ResponseEntity<List<Object>> getResponseEntityOfPage(Integer pageNumber, Integer limit, List<Stock> stocks) {
+        int countStocks = stocks.size();
+        if (limit < countStocks) {
+            List<List<Stock>> pagesOfStocks = Lists.partition(stocks, limit);
+            int countPages = pagesOfStocks.size();
+            if (pageNumber < 1 || pageNumber > countPages) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else {
-                return ResponseEntity.ok(Collections.singletonList(stocks));
+                PageOfStocks page = new PageOfStocks(pagesOfStocks.get(pageNumber - 1), pageNumber, limit,
+                        countPages, countStocks);
+                return ResponseEntity.ok(Collections.singletonList(page));
             }
         } else {
             return ResponseEntity.ok(Collections.singletonList(stocks));

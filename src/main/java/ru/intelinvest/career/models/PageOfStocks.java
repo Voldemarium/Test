@@ -1,22 +1,16 @@
 package ru.intelinvest.career.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class PageOfStocks {
     List<Stock> stockList;
     int currentNumberPage;
     int limit;
     int countPages;
     int countAllStocks;
-
-    public PageOfStocks(List<Stock> stockList, int currentNumberPage, int limit, int countPages, int countAllStocks) {
-        this.stockList = stockList;
-        this.currentNumberPage = currentNumberPage;
-        this.limit = limit;
-        this.countPages = countPages;
-        this.countAllStocks = countAllStocks;
-    }
 }

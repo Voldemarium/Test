@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 @Data
 public class BalanceOfTokens {
@@ -15,8 +16,8 @@ public class BalanceOfTokens {
     @JsonProperty("result")
     BigInteger balance;
 
-    public BigDecimal getBalance() {
-        return new BigDecimal(balance, 18);
+    public Double getBalance() {
+        return new BigDecimal(balance, 18).setScale(2, RoundingMode.HALF_DOWN).doubleValue();
     }
 
 }

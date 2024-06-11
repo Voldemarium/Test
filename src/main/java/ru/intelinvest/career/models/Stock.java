@@ -17,40 +17,14 @@
 package ru.intelinvest.career.models;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import lombok.Data;
-import java.util.Date;
+
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@JsonPropertyOrder({   // Порялок полей при сериализации
-        "SECID",
-        "BOARDID",
-        "SHORTNAME",
-        "PREVPRICE",
-        "LOTSIZE",
-        "FACEVALUE",
-        "STATUS",
-        "BOARDNAME",
-        "DECIMALS",
-        "SECNAME",
-        "REMARKS",
-        "MARKETCODE",
-        "INSTRID",
-        "SECTORID",
-        "MINSTEP",
-        "PREVWAPRICE",
-        "FACEUNIT",
-        "PREVDATE",
-        "ISSUESIZE",
-        "ISIN",
-        "LATNAME",
-        "REGNUMBER",
-        "PREVLEGALCLOSEPRICE",
-        "CURRENCYID",
-        "SECTYPE",
-        "LISTLEVEL",
-        "SETTLEDATE"
-})
 @Data
 public class Stock {
     @JsonProperty("SECID")
@@ -87,8 +61,9 @@ public class Stock {
     private Double prevwaprice;
     @JsonProperty("FACEUNIT")
     private String faceunit;
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonProperty("PREVDATE")
-    private Date prevdate;
+    private LocalDate prevdate;
     @JsonProperty("ISSUESIZE")
     private Long issuesize;
     @JsonProperty("ISIN")
@@ -105,20 +80,11 @@ public class Stock {
     private String sectype;
     @JsonProperty("LISTLEVEL")
     private Integer listlevel;
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonProperty("SETTLEDATE")
-    private Date settledate;
+    private LocalDate settledate;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<>();
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
 
 }
 

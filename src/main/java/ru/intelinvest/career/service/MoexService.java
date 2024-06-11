@@ -18,6 +18,7 @@ package ru.intelinvest.career.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +33,10 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class MoexService {
-
     private final RestTemplate restTemplate;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Cacheable(value = "stock")
     public List<Stock> getStocks() {
         // todo реализация задания № 1 здесь
         ResponseEntity<LinkedHashMap<String, Object>[]> responseEntity =
@@ -57,5 +58,7 @@ public class MoexService {
         }
         return stocks;
     }
+
+
 
 }
